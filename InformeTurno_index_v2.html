@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Informe de Turno — Akapol</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --bg:#f0ede8;--card:#fff;--tx:#1c1a17;--mu:#7a7570;--br:#dedad4;
+  --ac:#1a6fc4;--ac2:#6dade8;--head:#1c1a17;--gn:#2e7d32;--gn2:#d4edda;
+  --yl:#f59e0b;--yl2:#fef3c7;--rd:#c0392b;--rd2:#fdecea;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-size:14px;padding-bottom:40px;}
+
+.hdr{background:var(--head);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.hdr-left .ey{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac2);font-family:'Space Mono',monospace;margin-bottom:3px;}
+.hdr-left h1{font-size:19px;font-weight:800;}
+.hdr-right{display:flex;gap:8px;}
+
+.wrap{max-width:900px;margin:0 auto;padding:16px 16px 0;}
+.status-line{padding:6px 4px;font-size:11px;color:var(--mu);}
+
+.aviso-mail{background:var(--yl2);border:1px solid #f2d492;color:#8a6100;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:14px;}
+
+.filtro-wrap{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.filtro-wrap select,.filtro-wrap input{padding:9px 10px;border:1px solid var(--br);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;background:#fff;}
+.filtro-wrap input[type="text"]{flex:1;min-width:160px;}
+
+.inf-card{background:var(--card);border:1px solid var(--br);border-radius:12px;margin-bottom:10px;padding:14px 16px;}
+.inf-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+.inf-fecha{font-family:'Space Mono',monospace;font-weight:700;color:var(--ac);font-size:13px;}
+.inf-resp{font-size:11px;color:var(--mu);margin-top:2px;}
+.chip{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;}
+.chip-manana{background:#fef3c7;color:#8a6100;}
+.chip-tarde{background:#e2ecf9;color:var(--ac);}
+.inf-resumen{font-size:12.5px;margin-top:8px;line-height:1.45;color:#41403c;}
+.inf-conteos{display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--mu);}
+.inf-acciones{margin-top:10px;display:flex;gap:14px;align-items:center;}
+.link-mini{color:var(--ac);font-size:11.5px;font-weight:700;cursor:pointer;text-decoration:underline;background:none;border:none;padding:0;}
+.vacio{text-align:center;color:var(--mu);font-size:13px;padding:40px 10px;}
+
+.btn{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif;}
+.btn-ac{background:var(--ac);color:#fff;}
+.btn-gh{background:#fff;border:1px solid var(--br);color:var(--tx);}
+.btn-rd{background:var(--rd2);color:var(--rd);}
+.btn[disabled]{opacity:.55;cursor:default;}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-start;justify-content:center;z-index:100;padding:16px;overflow:auto;}
+.modal-bg.show{display:flex;}
+.modal{background:#fff;border-radius:14px;max-width:640px;width:100%;max-height:none;padding:22px;margin:20px 0 40px;}
+.modal h3{font-size:16px;margin-bottom:4px;}
+.modal .sub{font-size:11.5px;color:var(--mu);margin-bottom:14px;}
+.modal-cerrar{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--mu);}
+.f label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--mu);margin:12px 0 5px;}
+.f input,.f select,.f textarea{width:100%;padding:9px 10px;border:1px solid #a9cdec;background:#f2f8fd;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--tx);}
+.f textarea{resize:vertical;min-height:60px;}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:520px){.f-row{grid-template-columns:1fr;}}
+
+.sec-titulo{font-size:13px;font-weight:800;margin-top:18px;padding-bottom:6px;border-bottom:1px solid var(--br);display:flex;justify-content:space-between;align-items:center;}
+.sec-titulo .btn{padding:4px 10px;font-size:11px;}
+
+.falla-row,.tarea-row{background:var(--bg);border:1px solid var(--br);border-radius:9px;padding:10px 12px;margin-top:8px;position:relative;}
+.falla-row .f-row{margin-bottom:0;}
+.falla-row label,.tarea-row label{margin-top:8px;}
+.falla-row label:first-child,.tarea-row label:first-child{margin-top:0;}
+.quitar-fila{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--rd);font-size:12px;font-weight:700;cursor:pointer;}
+.sin-filas{font-size:11.5px;color:var(--mu);font-style:italic;padding:10px 2px 2px;}
+
+.modal-acciones{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
+.msg-err{background:var(--rd2);color:var(--rd);border-radius:8px;padding:9px 12px;font-size:12px;margin-top:12px;display:none;}
+.msg-err.show{display:block;}
+.msg-ok{background:var(--gn2);color:var(--gn);border-radius:8px;padding:9px 12px;font-size:12px;margin-top:12px;display:none;}
+.msg-ok.show{display:block;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="ey">Akapol · Mantenimiento</div>
+    <h1>Informe de Turno</h1>
+  </div>
+  <div class="hdr-right">
+    <button class="btn btn-ac" onclick="abrirModalNuevo()">+ Nuevo informe</button>
+    <button class="btn btn-gh" onclick="cargarDatos()">🔄 Actualizar</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="status-line" id="estadoSync">Conectando con la planilla...</div>
+
+  <div class="filtro-wrap">
+    <select id="fTurno" onchange="renderLista()">
+      <option value="">Todos los turnos</option>
+      <option value="Mañana">Mañana</option>
+      <option value="Tarde">Tarde</option>
+    </select>
+    <input type="text" id="fTexto" placeholder="Buscar por responsable, equipo, texto..." oninput="renderLista()">
+  </div>
+
+  <div id="listaRoot"></div>
+</div>
+
+<!-- Modal: nuevo informe -->
+<div class="modal-bg" id="modalNuevo">
+  <div class="modal">
+    <button class="modal-cerrar" onclick="cerrarModalNuevo()">✕</button>
+    <h3>Nuevo informe de turno</h3>
+    <div class="sub">Se completa al final del turno, con el recuento de llamados y atenciones. Al guardar se genera el PDF automáticamente.</div>
+
+    <div class="f-row">
+      <div class="f">
+        <label>Turno</label>
+        <select id="nTurno">
+          <option value="Mañana">Mañana</option>
+          <option value="Tarde">Tarde</option>
+        </select>
+      </div>
+      <div class="f">
+        <label>Fecha</label>
+        <input type="date" id="nFecha">
+      </div>
+    </div>
+    <div class="f">
+      <label>Responsable</label>
+      <input type="text" id="nResponsable" placeholder="Ej: Matías Coronel">
+    </div>
+    <div class="f">
+      <label>Resumen general del turno</label>
+      <textarea id="nResumen" placeholder="Cómo estuvo el turno en general..."></textarea>
+    </div>
+
+    <div class="sec-titulo">
+      Fallas / intervenciones
+      <button class="btn btn-gh" onclick="agregarFalla()">+ Agregar</button>
+    </div>
+    <div id="fallasRoot"></div>
+
+    <div class="sec-titulo">
+      Otras tareas / novedades
+      <button class="btn btn-gh" onclick="agregarTarea()">+ Agregar</button>
+    </div>
+    <div id="tareasRoot"></div>
+
+    <div class="f">
+      <label>Pendientes para el próximo turno</label>
+      <textarea id="nPendientes" placeholder="Qué queda para que retome el otro turno..."></textarea>
+    </div>
+
+    <div class="msg-err" id="nError"></div>
+    <div class="msg-ok" id="nOk"></div>
+
+    <div class="modal-acciones">
+      <button class="btn btn-gh" onclick="cerrarModalNuevo()">Cancelar</button>
+      <button class="btn btn-ac" id="btnGuardar" onclick="guardarInforme()">Guardar informe</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: detalle de un informe -->
+<div class="modal-bg" id="modalDetalle">
+  <div class="modal">
+    <button class="modal-cerrar" onclick="cerrarModalDetalle()">✕</button>
+    <div id="detalleRoot"></div>
+  </div>
+</div>
+
+<script>
+// -----------------------------------------------------------------
+// Pegar acá la URL del deploy de Apps Script (termina en /exec)
+// -----------------------------------------------------------------
+var APPS_SCRIPT_URL = 'PEGAR_AQUI_LA_URL_DEL_DEPLOY_DE_APPS_SCRIPT';
+
+var INFORMES = [];
+var contFallas = 0;
+var contTareas = 0;
+
+function hoyIso(){
+  var d = new Date();
+  var m = String(d.getMonth()+1).padStart(2,'0');
+  var dd = String(d.getDate()).padStart(2,'0');
+  return d.getFullYear() + '-' + m + '-' + dd;
+}
+
+function escHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function fmtFechaLarga(fechaIso){
+  if(!fechaIso) return '—';
+  var p = fechaIso.split('-');
+  if(p.length !== 3) return fechaIso;
+  var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return parseInt(p[2],10) + ' de ' + meses[parseInt(p[1],10)-1] + ' de ' + p[0];
+}
+
+// ---------------- Carga de datos ----------------
+
+function cargarDatos(){
+  var el = document.getElementById('estadoSync');
+  el.textContent = 'Actualizando...';
+  fetch(APPS_SCRIPT_URL)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      INFORMES = data.informes || [];
+      INFORMES.sort(function(a,b){
+        if(a.fecha === b.fecha) return (b.created_at||'').localeCompare(a.created_at||'');
+        return b.fecha.localeCompare(a.fecha);
+      });
+      el.textContent = 'Última actualización: ' + new Date().toLocaleTimeString('es-AR');
+      renderLista();
+    })
+    .catch(function(err){
+      el.textContent = 'No se pudo conectar con la planilla. Revisá APPS_SCRIPT_URL.';
+      console.error(err);
+    });
+}
+
+// ---------------- Listado ----------------
+
+function renderLista(){
+  var root = document.getElementById('listaRoot');
+  var turno = document.getElementById('fTurno').value;
+  var texto = document.getElementById('fTexto').value.trim().toLowerCase();
+
+  var filtrados = INFORMES.filter(function(inf){
+    if(turno && inf.turno !== turno) return false;
+    if(texto){
+      var bolsa = [inf.responsable, inf.resumen, inf.pendientes].join(' ');
+      (inf.fallas||[]).forEach(function(f){ bolsa += ' ' + (f.equipo||'') + ' ' + (f.descripcion||''); });
+      (inf.tareas||[]).forEach(function(t){ bolsa += ' ' + (t.texto||''); });
+      if(bolsa.toLowerCase().indexOf(texto) === -1) return false;
+    }
+    return true;
+  });
+
+  if(!filtrados.length){
+    root.innerHTML = '<div class="vacio">Todavía no hay informes' + (turno||texto ? ' que coincidan con el filtro.' : ' cargados.') + '</div>';
+    return;
+  }
+
+  root.innerHTML = filtrados.map(function(inf){
+    var chipClase = inf.turno === 'Tarde' ? 'chip-tarde' : 'chip-manana';
+    var resumenCorto = (inf.resumen || '').slice(0, 220);
+    if((inf.resumen||'').length > 220) resumenCorto += '…';
+    var pdfLink = inf.pdf_url
+      ? '<a class="link-mini" href="' + escHtml(inf.pdf_url) + '" target="_blank" rel="noopener">📄 Ver PDF</a>'
+      : '<span style="font-size:11px;color:var(--mu)">Sin PDF</span>';
+    return '' +
+      '<div class="inf-card">' +
+        '<div class="inf-hdr">' +
+          '<div>' +
+            '<div class="inf-fecha">' + fmtFechaLarga(inf.fecha) + '</div>' +
+            '<div class="inf-resp">' + escHtml(inf.responsable || 'Sin responsable') + '</div>' +
+          '</div>' +
+          '<span class="chip ' + chipClase + '">' + escHtml(inf.turno) + '</span>' +
+        '</div>' +
+        (resumenCorto ? '<div class="inf-resumen">' + escHtml(resumenCorto) + '</div>' : '') +
+        '<div class="inf-conteos">' +
+          '<span>⚠️ ' + (inf.fallas||[]).length + ' falla(s)</span>' +
+          '<span>📝 ' + (inf.tareas||[]).length + ' tarea(s)</span>' +
+        '</div>' +
+        '<div class="inf-acciones">' +
+          '<button class="link-mini" onclick="verDetalle(\'' + inf.id + '\')">Ver detalle</button>' +
+          pdfLink +
+        '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function verDetalle(id){
+  var inf = INFORMES.find(function(i){ return i.id === id; });
+  if(!inf) return;
+  var chipClase = inf.turno === 'Tarde' ? 'chip-tarde' : 'chip-manana';
+
+  var html = '<h3>Informe de Turno — ' + escHtml(inf.turno) + '</h3>';
+  html += '<div class="sub">' + fmtFechaLarga(inf.fecha) + ' · ' + escHtml(inf.responsable || 'Sin responsable') + ' <span class="chip ' + chipClase + '" style="margin-left:6px">' + escHtml(inf.turno) + '</span></div>';
+
+  if(inf.resumen){
+    html += '<div class="sec-titulo">Resumen general</div><div class="inf-resumen">' + escHtml(inf.resumen) + '</div>';
+  }
+
+  html += '<div class="sec-titulo">Fallas / intervenciones</div>';
+  if(!inf.fallas || !inf.fallas.length){
+    html += '<div class="sin-filas">Sin fallas registradas.</div>';
+  } else {
+    html += inf.fallas.map(function(f){
+      return '<div class="falla-row"><strong>' + escHtml(f.equipo||'Sin equipo') + '</strong>' +
+        (f.descripcion ? '<div style="margin-top:4px;font-size:12.5px">' + escHtml(f.descripcion) + '</div>' : '') +
+        (f.tiempo ? '<div style="margin-top:4px;font-size:11px;color:var(--mu)">Tiempo: ' + escHtml(f.tiempo) + '</div>' : '') +
+        '</div>';
+    }).join('');
+  }
+
+  html += '<div class="sec-titulo">Otras tareas / novedades</div>';
+  if(!inf.tareas || !inf.tareas.length){
+    html += '<div class="sin-filas">Sin otras novedades.</div>';
+  } else {
+    html += inf.tareas.map(function(t){
+      return '<div class="tarea-row">' + escHtml(t.texto||'') + '</div>';
+    }).join('');
+  }
+
+  if(inf.pendientes){
+    html += '<div class="sec-titulo">Pendientes para el próximo turno</div><div class="inf-resumen">' + escHtml(inf.pendientes) + '</div>';
+  }
+
+  html += '<div class="modal-acciones">';
+  if(inf.pdf_url){
+    html += '<a class="btn btn-ac" style="text-decoration:none" href="' + escHtml(inf.pdf_url) + '" target="_blank" rel="noopener">📄 Ver / descargar PDF</a>';
+  }
+  html += '<button class="btn btn-gh" onclick="cerrarModalDetalle()">Cerrar</button>';
+  html += '</div>';
+
+  document.getElementById('detalleRoot').innerHTML = html;
+  document.getElementById('modalDetalle').classList.add('show');
+}
+
+function cerrarModalDetalle(){
+  document.getElementById('modalDetalle').classList.remove('show');
+}
+
+// ---------------- Formulario nuevo informe ----------------
+
+function abrirModalNuevo(){
+  document.getElementById('nTurno').value = 'Mañana';
+  document.getElementById('nFecha').value = hoyIso();
+  document.getElementById('nResponsable').value = '';
+  document.getElementById('nResumen').value = '';
+  document.getElementById('nPendientes').value = '';
+  document.getElementById('fallasRoot').innerHTML = '';
+  document.getElementById('tareasRoot').innerHTML = '';
+  contFallas = 0;
+  contTareas = 0;
+  actualizarVaciosFallas();
+  actualizarVaciosTareas();
+  document.getElementById('nError').classList.remove('show');
+  document.getElementById('nOk').classList.remove('show');
+  document.getElementById('btnGuardar').disabled = false;
+  document.getElementById('btnGuardar').textContent = 'Guardar informe';
+  document.getElementById('modalNuevo').classList.add('show');
+}
+
+function cerrarModalNuevo(){
+  document.getElementById('modalNuevo').classList.remove('show');
+}
+
+function actualizarVaciosFallas(){
+  var root = document.getElementById('fallasRoot');
+  var hayFilas = root.querySelector('.falla-row');
+  var vacio = root.querySelector('.sin-filas');
+  if(!hayFilas && !vacio){
+    var d = document.createElement('div');
+    d.className = 'sin-filas';
+    d.textContent = 'Sin fallas cargadas. Si el turno no tuvo fallas, dejalo así.';
+    root.appendChild(d);
+  } else if(hayFilas && vacio){
+    vacio.remove();
+  }
+}
+
+function actualizarVaciosTareas(){
+  var root = document.getElementById('tareasRoot');
+  var hayFilas = root.querySelector('.tarea-row');
+  var vacio = root.querySelector('.sin-filas');
+  if(!hayFilas && !vacio){
+    var d = document.createElement('div');
+    d.className = 'sin-filas';
+    d.textContent = 'Sin otras tareas cargadas.';
+    root.appendChild(d);
+  } else if(hayFilas && vacio){
+    vacio.remove();
+  }
+}
+
+function agregarFalla(){
+  contFallas++;
+  var id = 'falla_' + contFallas;
+  var div = document.createElement('div');
+  div.className = 'falla-row';
+  div.id = id;
+  div.innerHTML =
+    '<button class="quitar-fila" onclick="quitarFila(\'' + id + '\', \'fallasRoot\')">✕ Quitar</button>' +
+    '<label>Equipo</label>' +
+    '<input type="text" class="fEquipo" placeholder="Ej: Chiller línea 2">' +
+    '<label>Descripción</label>' +
+    '<input type="text" class="fDescripcion" placeholder="Qué pasó / qué se hizo">' +
+    '<label>Tiempo que llevó</label>' +
+    '<div class="f-row">' +
+      '<input type="number" min="0" step="1" class="fTiempoValor" placeholder="Ej: 20">' +
+      '<select class="fTiempoUnidad">' +
+        '<option value="min">Minutos</option>' +
+        '<option value="hs">Horas</option>' +
+      '</select>' +
+    '</div>';
+  document.getElementById('fallasRoot').appendChild(div);
+  actualizarVaciosFallas();
+}
+
+function agregarTarea(){
+  contTareas++;
+  var id = 'tarea_' + contTareas;
+  var div = document.createElement('div');
+  div.className = 'tarea-row';
+  div.id = id;
+  div.innerHTML =
+    '<button class="quitar-fila" onclick="quitarFila(\'' + id + '\', \'tareasRoot\')">✕ Quitar</button>' +
+    '<label>Descripción</label>' +
+    '<input type="text" class="tTexto" placeholder="Novedad, tarea preventiva, aviso, etc.">';
+  document.getElementById('tareasRoot').appendChild(div);
+  actualizarVaciosTareas();
+}
+
+function quitarFila(id, rootId){
+  var el = document.getElementById(id);
+  if(el) el.remove();
+  if(rootId === 'fallasRoot') actualizarVaciosFallas();
+  else actualizarVaciosTareas();
+}
+
+function guardarInforme(){
+  var turno = document.getElementById('nTurno').value;
+  var fecha = document.getElementById('nFecha').value;
+  var responsable = document.getElementById('nResponsable').value.trim();
+  var resumen = document.getElementById('nResumen').value.trim();
+  var pendientes = document.getElementById('nPendientes').value.trim();
+
+  var errEl = document.getElementById('nError');
+  var okEl = document.getElementById('nOk');
+  errEl.classList.remove('show');
+  okEl.classList.remove('show');
+
+  if(!fecha){
+    errEl.textContent = 'Falta la fecha.';
+    errEl.classList.add('show');
+    return;
+  }
+  if(!responsable){
+    errEl.textContent = 'Falta el responsable del turno.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  var fallas = Array.prototype.map.call(document.querySelectorAll('#fallasRoot .falla-row'), function(row){
+    var valor = row.querySelector('.fTiempoValor').value.trim();
+    var unidad = row.querySelector('.fTiempoUnidad').value;
+    var tiempo = '';
+    if(valor){
+      var n = parseFloat(valor.replace(',', '.'));
+      if(unidad === 'hs') tiempo = valor + ' ' + (n === 1 ? 'hora' : 'horas');
+      else tiempo = valor + ' ' + (n === 1 ? 'minuto' : 'minutos');
+    }
+    return {
+      equipo: row.querySelector('.fEquipo').value.trim(),
+      descripcion: row.querySelector('.fDescripcion').value.trim(),
+      tiempo: tiempo
+    };
+  }).filter(function(f){ return f.equipo || f.descripcion; });
+
+  var tareas = Array.prototype.map.call(document.querySelectorAll('#tareasRoot .tarea-row'), function(row){
+    return { texto: row.querySelector('.tTexto').value.trim() };
+  }).filter(function(t){ return t.texto; });
+
+  var payload = {
+    action: 'nuevo',
+    fecha: fecha,
+    turno: turno,
+    responsable: responsable,
+    resumen: resumen,
+    fallas: fallas,
+    tareas: tareas,
+    pendientes: pendientes
+  };
+
+  var btn = document.getElementById('btnGuardar');
+  btn.disabled = true;
+  btn.textContent = 'Generando PDF...';
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.ok){
+        errEl.textContent = data.error || 'No se pudo guardar el informe.';
+        errEl.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Guardar informe';
+        return;
+      }
+      okEl.textContent = data.mailEnviado
+        ? 'Informe guardado, PDF generado y mail enviado.'
+        : 'Informe guardado y PDF generado. (Todavía no se manda mail: falta definir la lista de destinatarios.)';
+      okEl.classList.add('show');
+      btn.textContent = 'Guardado ✓';
+      cargarDatos();
+      setTimeout(cerrarModalNuevo, 1600);
+    })
+    .catch(function(err){
+      console.error(err);
+      errEl.textContent = 'Error de conexión al guardar. Probá de nuevo.';
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Guardar informe';
+    });
+}
+
+cargarDatos();
+</script>
+</body>
+</html>
