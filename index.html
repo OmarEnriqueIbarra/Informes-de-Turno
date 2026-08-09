@@ -22,8 +22,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
 .wrap{max-width:900px;margin:0 auto;padding:16px 16px 0;}
 .status-line{padding:6px 4px;font-size:11px;color:var(--mu);}
 
-.aviso-mail{background:var(--yl2);border:1px solid #f2d492;color:#8a6100;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:14px;}
-
 .filtro-wrap{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
 .filtro-wrap select,.filtro-wrap input{padding:9px 10px;border:1px solid var(--br);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;background:#fff;}
 .filtro-wrap input[type="text"]{flex:1;min-width:160px;}
@@ -56,18 +54,29 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
 .f label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--mu);margin:12px 0 5px;}
 .f input,.f select,.f textarea{width:100%;padding:9px 10px;border:1px solid #a9cdec;background:#f2f8fd;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--tx);}
 .f textarea{resize:vertical;min-height:60px;}
-.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:520px){.f-row{grid-template-columns:1fr;}}
+
+/* Fila compacta de arriba: Turno / Fecha / Responsable */
+.top-row{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:8px;margin-bottom:4px;}
+@media(max-width:520px){.top-row{grid-template-columns:1fr;}}
+.top-f label{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--mu);margin-bottom:3px;}
+.top-f select,.top-f input{width:100%;padding:6px 8px;border:1px solid #a9cdec;background:#f2f8fd;border-radius:7px;font-family:'Inter',sans-serif;font-size:12.5px;color:var(--tx);}
 
 .sec-titulo{font-size:13px;font-weight:800;margin-top:18px;padding-bottom:6px;border-bottom:1px solid var(--br);display:flex;justify-content:space-between;align-items:center;}
 .sec-titulo .btn{padding:4px 10px;font-size:11px;}
 
-.falla-row,.tarea-row{background:var(--bg);border:1px solid var(--br);border-radius:9px;padding:10px 12px;margin-top:8px;position:relative;}
-.falla-row .f-row{margin-bottom:0;}
-.falla-row label,.tarea-row label{margin-top:8px;}
-.falla-row label:first-child,.tarea-row label:first-child{margin-top:0;}
-.quitar-fila{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--rd);font-size:12px;font-weight:700;cursor:pointer;}
+/* Lista numerada de tareas del turno */
+.tarea-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.tarea-num{width:20px;flex:none;font-weight:800;color:var(--ac);font-size:13px;text-align:right;}
+.tarea-desc{flex:1;min-width:160px;padding:8px 10px;border:1px solid #a9cdec;background:#f2f8fd;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;color:var(--tx);}
+.tarea-tiempo{width:64px;flex:none;padding:8px 6px;border:1px solid #a9cdec;background:#f2f8fd;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;color:var(--tx);text-align:center;}
+.tarea-unidad{width:88px;flex:none;padding:8px 4px;border:1px solid #a9cdec;background:#f2f8fd;border-radius:8px;font-family:'Inter',sans-serif;font-size:12px;color:var(--tx);}
+.tarea-quitar{flex:none;background:none;border:none;color:var(--rd);font-size:15px;font-weight:700;cursor:pointer;padding:2px 4px;}
 .sin-filas{font-size:11.5px;color:var(--mu);font-style:italic;padding:10px 2px 2px;}
+
+.detalle-tarea{border-bottom:1px solid var(--br);padding:8px 0;font-size:12.5px;}
+.detalle-tarea:last-child{border-bottom:none;}
+.detalle-tarea .num{font-weight:800;color:var(--ac);margin-right:4px;}
+.detalle-tarea .tiempo{color:var(--mu);font-size:11px;margin-left:4px;}
 
 .modal-acciones{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
 .msg-err{background:var(--rd2);color:var(--rd);border-radius:8px;padding:9px 12px;font-size:12px;margin-top:12px;display:none;}
@@ -98,7 +107,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
       <option value="Mañana">Mañana</option>
       <option value="Tarde">Tarde</option>
     </select>
-    <input type="text" id="fTexto" placeholder="Buscar por responsable, equipo, texto..." oninput="renderLista()">
+    <input type="text" id="fTexto" placeholder="Buscar por responsable, tarea, texto..." oninput="renderLista()">
   </div>
 
   <div id="listaRoot"></div>
@@ -111,36 +120,31 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
     <h3>Nuevo informe de turno</h3>
     <div class="sub">Se completa al final del turno, con el recuento de llamados y atenciones. Al guardar se genera el PDF automáticamente.</div>
 
-    <div class="f-row">
-      <div class="f">
+    <div class="top-row">
+      <div class="top-f">
         <label>Turno</label>
         <select id="nTurno">
           <option value="Mañana">Mañana</option>
           <option value="Tarde">Tarde</option>
         </select>
       </div>
-      <div class="f">
+      <div class="top-f">
         <label>Fecha</label>
         <input type="date" id="nFecha">
       </div>
+      <div class="top-f">
+        <label>Responsable</label>
+        <input type="text" id="nResponsable" placeholder="Ej: Matías Coronel">
+      </div>
     </div>
-    <div class="f">
-      <label>Responsable</label>
-      <input type="text" id="nResponsable" placeholder="Ej: Matías Coronel">
-    </div>
+
     <div class="f">
       <label>Resumen general del turno</label>
       <textarea id="nResumen" placeholder="Cómo estuvo el turno en general..."></textarea>
     </div>
 
     <div class="sec-titulo">
-      Fallas / intervenciones
-      <button class="btn btn-gh" onclick="agregarFalla()">+ Agregar</button>
-    </div>
-    <div id="fallasRoot"></div>
-
-    <div class="sec-titulo">
-      Otras tareas / novedades
+      Tareas del turno
       <button class="btn btn-gh" onclick="agregarTarea()">+ Agregar</button>
     </div>
     <div id="tareasRoot"></div>
@@ -175,7 +179,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgezs0RWNoldTYCR5OJfcFxG72_hhMNSKx4ebu5rqb8WHG7JlODrGAdTbC6f9FS-U7zQ/exec';
 
 var INFORMES = [];
-var contFallas = 0;
 var contTareas = 0;
 
 function hoyIso(){
@@ -232,7 +235,6 @@ function renderLista(){
     if(turno && inf.turno !== turno) return false;
     if(texto){
       var bolsa = [inf.responsable, inf.resumen, inf.pendientes].join(' ');
-      (inf.fallas||[]).forEach(function(f){ bolsa += ' ' + (f.equipo||'') + ' ' + (f.descripcion||''); });
       (inf.tareas||[]).forEach(function(t){ bolsa += ' ' + (t.texto||''); });
       if(bolsa.toLowerCase().indexOf(texto) === -1) return false;
     }
@@ -262,7 +264,6 @@ function renderLista(){
         '</div>' +
         (resumenCorto ? '<div class="inf-resumen">' + escHtml(resumenCorto) + '</div>' : '') +
         '<div class="inf-conteos">' +
-          '<span>⚠️ ' + (inf.fallas||[]).length + ' falla(s)</span>' +
           '<span>📝 ' + (inf.tareas||[]).length + ' tarea(s)</span>' +
         '</div>' +
         '<div class="inf-acciones">' +
@@ -285,24 +286,14 @@ function verDetalle(id){
     html += '<div class="sec-titulo">Resumen general</div><div class="inf-resumen">' + escHtml(inf.resumen) + '</div>';
   }
 
-  html += '<div class="sec-titulo">Fallas / intervenciones</div>';
-  if(!inf.fallas || !inf.fallas.length){
-    html += '<div class="sin-filas">Sin fallas registradas.</div>';
-  } else {
-    html += inf.fallas.map(function(f){
-      return '<div class="falla-row"><strong>' + escHtml(f.equipo||'Sin equipo') + '</strong>' +
-        (f.descripcion ? '<div style="margin-top:4px;font-size:12.5px">' + escHtml(f.descripcion) + '</div>' : '') +
-        (f.tiempo ? '<div style="margin-top:4px;font-size:11px;color:var(--mu)">Tiempo: ' + escHtml(f.tiempo) + '</div>' : '') +
-        '</div>';
-    }).join('');
-  }
-
-  html += '<div class="sec-titulo">Otras tareas / novedades</div>';
+  html += '<div class="sec-titulo">Tareas del turno</div>';
   if(!inf.tareas || !inf.tareas.length){
-    html += '<div class="sin-filas">Sin otras novedades.</div>';
+    html += '<div class="sin-filas">Sin tareas registradas.</div>';
   } else {
-    html += inf.tareas.map(function(t){
-      return '<div class="tarea-row">' + escHtml(t.texto||'') + '</div>';
+    html += inf.tareas.map(function(t, i){
+      return '<div class="detalle-tarea"><span class="num">' + (i+1) + '.</span>' + escHtml(t.texto||'') +
+        (t.tiempo ? '<span class="tiempo">(' + escHtml(t.tiempo) + ')</span>' : '') +
+        '</div>';
     }).join('');
   }
 
@@ -333,11 +324,8 @@ function abrirModalNuevo(){
   document.getElementById('nResponsable').value = '';
   document.getElementById('nResumen').value = '';
   document.getElementById('nPendientes').value = '';
-  document.getElementById('fallasRoot').innerHTML = '';
   document.getElementById('tareasRoot').innerHTML = '';
-  contFallas = 0;
   contTareas = 0;
-  actualizarVaciosFallas();
   actualizarVaciosTareas();
   document.getElementById('nError').classList.remove('show');
   document.getElementById('nOk').classList.remove('show');
@@ -350,20 +338,6 @@ function cerrarModalNuevo(){
   document.getElementById('modalNuevo').classList.remove('show');
 }
 
-function actualizarVaciosFallas(){
-  var root = document.getElementById('fallasRoot');
-  var hayFilas = root.querySelector('.falla-row');
-  var vacio = root.querySelector('.sin-filas');
-  if(!hayFilas && !vacio){
-    var d = document.createElement('div');
-    d.className = 'sin-filas';
-    d.textContent = 'Sin fallas cargadas. Si el turno no tuvo fallas, dejalo así.';
-    root.appendChild(d);
-  } else if(hayFilas && vacio){
-    vacio.remove();
-  }
-}
-
 function actualizarVaciosTareas(){
   var root = document.getElementById('tareasRoot');
   var hayFilas = root.querySelector('.tarea-row');
@@ -371,35 +345,20 @@ function actualizarVaciosTareas(){
   if(!hayFilas && !vacio){
     var d = document.createElement('div');
     d.className = 'sin-filas';
-    d.textContent = 'Sin otras tareas cargadas.';
+    d.textContent = 'Sin tareas cargadas. Agregá una por cada llamado o atención del turno.';
     root.appendChild(d);
   } else if(hayFilas && vacio){
     vacio.remove();
   }
+  renumerarTareas();
 }
 
-function agregarFalla(){
-  contFallas++;
-  var id = 'falla_' + contFallas;
-  var div = document.createElement('div');
-  div.className = 'falla-row';
-  div.id = id;
-  div.innerHTML =
-    '<button class="quitar-fila" onclick="quitarFila(\'' + id + '\', \'fallasRoot\')">✕ Quitar</button>' +
-    '<label>Equipo</label>' +
-    '<input type="text" class="fEquipo" placeholder="Ej: Chiller línea 2">' +
-    '<label>Descripción</label>' +
-    '<input type="text" class="fDescripcion" placeholder="Qué pasó / qué se hizo">' +
-    '<label>Tiempo que llevó</label>' +
-    '<div class="f-row">' +
-      '<input type="number" min="0" step="1" class="fTiempoValor" placeholder="Ej: 20">' +
-      '<select class="fTiempoUnidad">' +
-        '<option value="min">Minutos</option>' +
-        '<option value="hs">Horas</option>' +
-      '</select>' +
-    '</div>';
-  document.getElementById('fallasRoot').appendChild(div);
-  actualizarVaciosFallas();
+function renumerarTareas(){
+  var filas = document.querySelectorAll('#tareasRoot .tarea-row');
+  filas.forEach(function(row, i){
+    var num = row.querySelector('.tarea-num');
+    if(num) num.textContent = (i+1) + '.';
+  });
 }
 
 function agregarTarea(){
@@ -409,18 +368,22 @@ function agregarTarea(){
   div.className = 'tarea-row';
   div.id = id;
   div.innerHTML =
-    '<button class="quitar-fila" onclick="quitarFila(\'' + id + '\', \'tareasRoot\')">✕ Quitar</button>' +
-    '<label>Descripción</label>' +
-    '<input type="text" class="tTexto" placeholder="Novedad, tarea preventiva, aviso, etc.">';
+    '<div class="tarea-num">1.</div>' +
+    '<input type="text" class="tarea-desc tTexto" placeholder="Descripción de la tarea...">' +
+    '<input type="number" min="0" step="1" class="tarea-tiempo tTiempoValor" placeholder="0">' +
+    '<select class="tarea-unidad tTiempoUnidad">' +
+      '<option value="min">Minutos</option>' +
+      '<option value="hs">Horas</option>' +
+    '</select>' +
+    '<button type="button" class="tarea-quitar" onclick="quitarTarea(\'' + id + '\')">✕</button>';
   document.getElementById('tareasRoot').appendChild(div);
   actualizarVaciosTareas();
 }
 
-function quitarFila(id, rootId){
+function quitarTarea(id){
   var el = document.getElementById(id);
   if(el) el.remove();
-  if(rootId === 'fallasRoot') actualizarVaciosFallas();
-  else actualizarVaciosTareas();
+  actualizarVaciosTareas();
 }
 
 function guardarInforme(){
@@ -446,9 +409,9 @@ function guardarInforme(){
     return;
   }
 
-  var fallas = Array.prototype.map.call(document.querySelectorAll('#fallasRoot .falla-row'), function(row){
-    var valor = row.querySelector('.fTiempoValor').value.trim();
-    var unidad = row.querySelector('.fTiempoUnidad').value;
+  var tareas = Array.prototype.map.call(document.querySelectorAll('#tareasRoot .tarea-row'), function(row){
+    var valor = row.querySelector('.tTiempoValor').value.trim();
+    var unidad = row.querySelector('.tTiempoUnidad').value;
     var tiempo = '';
     if(valor){
       var n = parseFloat(valor.replace(',', '.'));
@@ -456,14 +419,9 @@ function guardarInforme(){
       else tiempo = valor + ' ' + (n === 1 ? 'minuto' : 'minutos');
     }
     return {
-      equipo: row.querySelector('.fEquipo').value.trim(),
-      descripcion: row.querySelector('.fDescripcion').value.trim(),
+      texto: row.querySelector('.tTexto').value.trim(),
       tiempo: tiempo
     };
-  }).filter(function(f){ return f.equipo || f.descripcion; });
-
-  var tareas = Array.prototype.map.call(document.querySelectorAll('#tareasRoot .tarea-row'), function(row){
-    return { texto: row.querySelector('.tTexto').value.trim() };
   }).filter(function(t){ return t.texto; });
 
   var payload = {
@@ -472,7 +430,6 @@ function guardarInforme(){
     turno: turno,
     responsable: responsable,
     resumen: resumen,
-    fallas: fallas,
     tareas: tareas,
     pendientes: pendientes
   };
